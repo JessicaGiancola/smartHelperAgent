@@ -15,3 +15,4 @@ https://github.com/agnsal/KOINE-DALI
 
 # Dipendenze
 * libreria [redis](https://pypi.org/project/redis/)
+* libreria [switchcase](https://pypi.org/project/switchcase/)
