@@ -1,0 +1,1 @@
+You have to put DALI subfolders into this folder (KOINE-DALI/DALI) to make it work.

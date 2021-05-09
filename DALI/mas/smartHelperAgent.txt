@@ -1,0 +1,36 @@
+:- use_module(library(file_systems)).
+:- use_module(library(system)).
+
+:- compile('../mas/redis_client.pl').
+
+
+saturazioneE(X) :> X>=97, X=<100, mas_send('saturazione_normal');
+		X<97, X>=94, mas_send('saturazione_ok');
+		X<94, mas_send('saturazione_danger').
+
+battitoE(X) :> X>=60, X=<100, mas_send('battito_normal');
+		X<60, mas_send('battito_low');
+		X>100, mas_send('battito_high').
+
+presminimaE(X) :> X>=80, X=<84, mas_send('presminima_normal');
+		X>84, mas_send('presminima_high');
+		X<80, mas_send('presminima_low').
+
+presmassimaE(X) :> X>=115, X=<120, mas_send('presmassima_normal');
+		X>120, mas_send('presmassima_high');
+		X<115, mas_send('presmassima_low').
+
+
+temperaturaE(X) :> retract(temperature(_)), assert(temperature(X)).
+
+pesoE(X) :> retract(weight(_)), assert(weight(X)).
+
+altezzaE(X) :> retract(height(_)), assert(height(X)).
+
+statoE(X) :> retract(healthState(_)), assert(healthState(X)).
+
+patologiaE(X) :> assert(patologies(X)).
+
+ciaoE :> print('ciao user'), messageA(generalAgent,send_message(ciao,Ag)).
+
+provaE :> print('scrivo a python'), mas_send('prova_ricezione').
