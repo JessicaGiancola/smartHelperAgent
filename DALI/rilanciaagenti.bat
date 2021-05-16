@@ -8,7 +8,7 @@ set dali_home=src
 set conf_dir=conf
 set prolog=%sicstus_home%\spwin.exe
 set daliH=%dali_home:\=/%
-set WAIT=ping -n 6 127.0.0.1
+set WAIT=ping -n 3 127.0.0.1
 
 del /q work\*.pl
 copy mas\*.txt work
