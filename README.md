@@ -11,7 +11,9 @@ Agente Intelligente per il controllo di parametri vitali scritto in DALI e Pytho
 * Per il sistema multiagente (MAS) in DALI ho fatto uso del Framework: <br>
 https://github.com/AAAI-DISIM-UnivAQ/DALI <br>
 * Per la comunicazione tra Python e il MAS ho fatto uso di KOINE-DALI realizzato da Agnese Salutari: <br>
-https://github.com/agnsal/KOINE-DALI
+https://github.com/agnsal/KOINE-DALI <br>
+* Ho integrato le modifiche al parser/interprete realizzate da Silvio Di Ubaldo: <br>
+https://github.com/diubaldo94/DALI<br>
 
 # Dipendenze
 * libreria [redis](https://pypi.org/project/redis/)
