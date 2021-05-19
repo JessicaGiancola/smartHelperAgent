@@ -14,7 +14,7 @@
 
 :- datime(datime(Year,Month,Day,Hour,Min,Sec)), if((Hour==00, Min == 00), retractall(taken(_))).
 
-:- assert(therapy(medicine('Eutirox 50','1'),18,09)).
+:- assert(therapy(medicine('Eutirox%2050','1'),18,09)).
 :- assert(therapy(medicine('aspirina','2'),17,03)).
 :- assert(malattia(ipotiroidismo)).
 

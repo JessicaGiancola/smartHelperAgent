@@ -18,19 +18,20 @@ def clearList(redisInstance, channel):
 def sendResponse(message):
     # Elaboro la risposta e la invio al database
     splitted_message = message.split(SEPARATOR)
-
-    for case in switch(splitted_message):
+    to_send = ""
+    for case in switch(splitted_message[0]):
         if case('misura'):
             to_send = "Devi misurare " + splitted_message[1]
-            print(to_send)
             break
         if case('medicina'):
-            to_send = "Devi prendere la medicina " + splitted_message[1] + " quantità " + splitted_message[2]
-            print(to_send)
+            to_send = "Devi prendere la medicina " + splitted_message[1] + " quantita " + splitted_message[2]
         else:
             print('Risposta non valida')
 
-    url = "http://www.lorenzodelauretis.it/tesi/index.php?message="+to_send
+    to_send_url = to_send.replace(" ", "%20")
+    url = "http://www.lorenzodelauretis.it/tesi/index.php?message=" + to_send_url
+    #url = "http://localhost/prova.php?message=" + to_send_url
+    print(url)
     req.get(url)
     
     return
