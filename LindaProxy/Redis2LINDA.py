@@ -44,4 +44,4 @@ for item in pubsub.listen():
         msg=item['data'].decode('utf-8')
         #atomic = makeAtomic(msg)
         print('evento redis', msg)
-        L.send_message('smartHelperAgent', msg)
+        L.send_message('smartHealthHelper', msg)

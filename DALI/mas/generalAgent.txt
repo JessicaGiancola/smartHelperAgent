@@ -1,7 +1,6 @@
 :- compile('../mas/redis_client.pl').
-:- mas_send('prova_attivato').
-
-:- messageA(smartHelperAgent,send_message(ciao,Ag)).
 
 ciaoE :> print('ciao helper').
+
+pericoloE :> print('pericolo').
 

@@ -9,7 +9,8 @@ CH_OUT = 'TO_AGENT'
 
 def getParameters(parameters, redisInstance, name):
     for parameter in parameters:
-        request_url = "http://www.lorenzodelauretis.it/tesi/index.php?nome=" + name + "&" + parameter[1] + "=1"
+        #request_url = "http://www.lorenzodelauretis.it/tesi/index.php?nome=" + name + "&" + parameter[1] + "=1"
+        request_url = "http://localhost/prova.php?nome=" + name + "&" + parameter[1] + "=1"
         response = req.get(request_url)
         prologParam = parameter[0]+"("+response.text+")"
         redisInstance.publish(CH_OUT, prologParam)  # Pubblico sul canale il parametro raccolto
@@ -24,14 +25,15 @@ name_url = patientName.replace(" ", "%20")
 parameters = [["saturazione", "get_saturazione"], ["battito", "get_battito"], ["presminima", "get_presminima"], ["presmassima", "get_presmassima"], ["temperatura", "get_temperatura"], ["peso", "get_peso"], ["altezza", "get_altezza"], ["stato", "get_stato"]]
 
 # Inserisco le malattie pregresse
-request_url = "http://www.lorenzodelauretis.it/tesi/index.php?nome=" + name_url + "&get_patologia=1"
-patologies = req.get(request_url)
-patologiesList = patologies.text.split(";")
-
-for patology in patologiesList:
-    if patology != '':
-        prolog = "patologies(" + patology + ")"
-        R.publish(CH_OUT, prolog)
+#request_url = "http://www.lorenzodelauretis.it/tesi/index.php?nome=" + name_url + "&get_patologia=1"
+# patologies = req.get(request_url)
+# patologiesList = patologies.text.split(";")
+#
+#
+# for patology in patologiesList:
+#     if patology != '':
+#         prolog = "patologia(" + patology + ")"
+#         R.publish(CH_OUT, prolog)
 
 for i in range(0, 10):
     getParameters(parameters, R, name_url)
