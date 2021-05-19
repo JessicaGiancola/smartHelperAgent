@@ -1,0 +1,55 @@
+:- use_module(library(file_systems)).
+:- use_module(library(system)).
+:- use_module(library(date)).
+
+:- compile('../mas/redis_client.pl').
+
+:- dynamic height/1.
+:- dynamic weight/1.
+:- dynamic healthState/1.
+:- dynamic patology/1.
+:- dynamic medicine/2.
+:- dynamic therapy/2.
+:- dynamic taken/1.
+
+:- datime(datime(Year,Month,Day,Hour,Min,Sec)), if((Hour==00, Min == 00), retractall(taken(_))).
+
+:- assert(therapy(medicine('Eutirox 50','1'),18,09)).
+:- assert(therapy(medicine('aspirina','2'),17,03)).
+:- assert(malattia(ipotiroidismo)).
+
+confront_time(Hmed,Mmed,Hatt,Matt,R) :- if(Hatt == Hmed, if(Matt >= Mmed, R = 'yes', R = 'no'), if(Hatt > Hmed, R = 'yes', R = 'no')).
+
+medicine('Eutirox 50',1) :- malattia(ipotiroidismo), \+ malattia(insufficienza_surrenalica), \+ malattia(insufficienza_ipofisaria).
+
+take_medicine(medicine(Med,Qta)) :- therapy(medicine(Med,Qta),H,M), datime(datime(Year,Month,Day,Hour,Min,Sec)), confront_time(H,M,Hour,Min,R), R=='yes', not(taken(Med)).
+
+take_medicineI(medicine(Med,Qta)):> atom_concat('medicina_',Med,M), atom_concat(M,'_',Mes), atom_concat(Mes,Qta,Message), print(Message), mas_send(Message).
+
+taken_medicineE(X) :> assert(taken(X)).
+
+saturazioneE(X) :> if(X<94, mas_send('saturazione_danger'),if(X<97, mas_send('saturazione_ok'),mas_send('saturazione_normal'))).
+
+battitoE(X) :> if(X<60, mas_send('battito_low'),if(X>100, mas_send('battito_high'), mas_send('battito_normal'))).
+
+presminimaE(X) :> if(X<80, mas_send('presminima_low'),if(X>84, mas_send('presminima_high'),mas_send('presminima_normal'))).
+
+presmassimaE(X) :> if(X<115, mas_send('presmassima_low'), if(X>120, mas_send('presmassima_high'), mas_send('presmassima_normal'))).
+
+temperaturaE(X) :> if(X>37, Message = 'pericolo', Message = 'tutto ok'), messageA(generalAgent,send_message(Message,Ag)), retractall(temperature(_)), assert(temperature(X)).
+
+pesoE(X) :> retractall(weight(_)), assert(weight(X)).
+
+altezzaE(X) :> retractall(height(_)), assert(height(X)).
+
+statoE(X) :> retractall(healthState(_)), assert(healthState(X)).
+
+patologiaE(X) :> assert(patology(X)).
+
+misura_temperatura(X) :- presmassimaP(X).
+
+misura_temperaturaI(X) :> print('scatenato evento'), mas_send('misura_temperatura').
+
+ciaoE :> print('ciao user'), messageA(generalAgent,send_message(ciao,Ag)).
+
+provaE :> print('scrivo a python'), mas_send('prova_ricezione').
