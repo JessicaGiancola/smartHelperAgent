@@ -12,21 +12,19 @@
 :- dynamic therapy/2.
 :- dynamic taken/1.
 
-:- datime(datime(Year,Month,Day,Hour,Min,Sec)), if((Hour==00, Min == 00), retractall(taken(_))).
+:- retractall(separator(_)), assert(separator('_')).
 
-:- assert(therapy(medicine('Eutirox%2050','1'),18,09)).
-:- assert(therapy(medicine('aspirina','2'),17,03)).
-:- assert(malattia(ipotiroidismo)).
+:- assert(therapy(medicine('Eutirox%2050','1'),17,46)).
+:- assert(therapy(medicine('aspirina','2'),17,46)).
 
-confront_time(Hmed,Mmed,Hatt,Matt,R) :- if(Hatt == Hmed, if(Matt >= Mmed, R = 'yes', R = 'no'), if(Hatt > Hmed, R = 'yes', R = 'no')).
+restart_therapy :- datime(datime(Year,Month,Day,Hour,Min,Sec)), Hour == 17, Min == 58.
+restart_therapyI :> retractall(taken(_)).
 
-medicine('Eutirox 50',1) :- malattia(ipotiroidismo), \+ malattia(insufficienza_surrenalica), \+ malattia(insufficienza_ipofisaria).
+take_medicine(therapy(medicine(Med,Qta),H,M)) :- therapy(medicine(Med,Qta),H,M), datime(datime(Year,Month,Day,Hour,Min,Sec)), H == Hour, Min >= M, not(taken(therapy(medicine(Med,Qta),H,M))).
 
-take_medicine(medicine(Med,Qta)) :- therapy(medicine(Med,Qta),H,M), datime(datime(Year,Month,Day,Hour,Min,Sec)), confront_time(H,M,Hour,Min,R), R=='yes', not(taken(Med)).
+take_medicineI(therapy(medicine(Med,Qta),H,M)):> separator(Sep), atom_concat('medicina',Sep,Me), atom_concat(Me,Med,Mes), atom_concat(Mes,Sep,Mess), atom_concat(Mess,Qta,Message), print(Message), mas_send(Message), assert(taken(therapy(medicine(Med,Qta),H,M))).
 
-take_medicineI(medicine(Med,Qta)):> atom_concat('medicina_',Med,M), atom_concat(M,'_',Mes), atom_concat(Mes,Qta,Message), print(Message), mas_send(Message).
-
-taken_medicineE(X) :> assert(taken(X)).
+terapiaE(X) :> assert(therapy(X)).
 
 saturazioneE(X) :> if(X<94, mas_send('saturazione_danger'),if(X<97, mas_send('saturazione_ok'),mas_send('saturazione_normal'))).
 
