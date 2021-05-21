@@ -1,4 +1,4 @@
-# smartHelperAgent
+# smartHealthHelperAgent
 Agente Intelligente per il controllo di parametri vitali scritto in DALI e Python3
 
 # Istruzioni
