@@ -17,7 +17,7 @@
 :- assert(therapy(medicine('Eutirox%2050','1'),17,46)).
 :- assert(therapy(medicine('aspirina','2'),17,46)).
 
-restart_therapy :- datime(datime(Year,Month,Day,Hour,Min,Sec)), Hour == 17, Min == 58.
+restart_therapy :- datime(datime(Year,Month,Day,Hour,Min,Sec)), Hour == 00, Min == 00.
 restart_therapyI :> retractall(taken(_)).
 
 take_medicine(therapy(medicine(Med,Qta),H,M)) :- therapy(medicine(Med,Qta),H,M), datime(datime(Year,Month,Day,Hour,Min,Sec)), H == Hour, Min >= M, not(taken(therapy(medicine(Med,Qta),H,M))).
