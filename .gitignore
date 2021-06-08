@@ -128,7 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .idea/
-DALI/work/
 DALI/conf/communication_smartHelperAgent.txt
 DALI/conf/communication_smartHelperAgent.pl
 DALI/conf/communication_smartHelperAgent.con
@@ -138,3 +137,9 @@ DALI/conf/communication_smartHealthHelper.con
 DALI/conf/communication_generalAgent.txt
 DALI/conf/communication_generalAgent.pl
 DALI/conf/communication_generalAgent.con
+*.plv
+DALI/work/smartHealthHelper.txt
+*.ple
+*.pl
+DALI/work/generalAgent.txt
+DALI/work/doctorAgent.txt

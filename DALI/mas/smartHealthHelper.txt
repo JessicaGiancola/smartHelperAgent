@@ -3,79 +3,162 @@
 :- use_module(library(date)).
 
 :- compile('../mas/redis_client.pl').
+:- compile('../pulisciStringhe.pl').
 
 :- dynamic height/1.
 :- dynamic weight/1.
 :- dynamic lists/2.
 :- dynamic healthState/1.
 :- dynamic patology/1.
-:- dynamic medicine/2.
-:- dynamic therapy/2.
+:- dynamic therapy/4.
 :- dynamic taken/1.
+:- dynamic temperature/1.
+:- dynamic tachicardia/0.
+:- dynamic ipossia_grave/0.
+:- dynamic presmin_alta/0.
+:- dynamic presmin_bassa/0.
+:- dynamic presmax_alta/0.
+:- dynamic presmax_bassa/0.
+:- dynamic fever/2.
+:- dynamic ipotensione/0.
+:- dynamic ipertensione/0.
+:- dynamic danger/1.
 
 :- assert(lists(weight,[])).
 :- assert(lists(heartbeat,[])).
 :- assert(lists(systolic_pressure,[])).
 :- assert(lists(diastolic_pressure,[])).
 :- assert(lists(saturation,[])).
+:- assert(lists(patology,[])).
+:- assert(lists(therapy,[])).
 
-:- retractall(separator(_)), assert(separator('_')).
+/* costanti */
+:- retractall(const_separator(_)), assert(const_separator('_')).
 :- retractall(const_misura(_)), assert(const_misura('misura')).
 
-:- assert(therapy(medicine('Eutirox%2050','1'),10,22)).
-:- assert(therapy(medicine('aspirina','2'),17,46)).
+
+/* reminder per terapia */
+take_medicine(therapy(Med,Qta,H,M)) :- therapy(Med,Qta,H,M), not(taken(therapy(Med,Qta,H,M))),
+        datime(datime(Year,Month,Day,Hour,Min,Sec)), adatta(Hour,Nh), adatta(Min,Nmin), Nh >= H, Nmin >= M.
+take_medicineI(therapy(Med,Qta,H,M)):> const_separator(Sep), atom_concat('medicina',Sep,Me), rimuovi_apici(Med,Nmed),atom_concat(Me,Nmed,Mes),
+        atom_concat(Mes,Sep,Mess), rimuovi_apici(Qta,Nqta), atom_concat(Mess,Nqta,Message), print(Message), mas_send(Message),
+        assert(taken(therapy(Med,Qta,H,M))).
 
 restart_therapy :- datime(datime(Year,Month,Day,Hour,Min,Sec)), Hour == 00, Min == 00.
 restart_therapyI :> retractall(taken(_)).
 
-take_medicine(therapy(medicine(Med,Qta),H,M)) :- therapy(medicine(Med,Qta),H,M), datime(datime(Year,Month,Day,Hour,Min,Sec)), H == Hour, Min >= M, not(taken(therapy(medicine(Med,Qta),H,M))).
-take_medicineI(therapy(medicine(Med,Qta),H,M)):> separator(Sep), atom_concat('medicina',Sep,Me), atom_concat(Me,Med,Mes), atom_concat(Mes,Sep,Mess), atom_concat(Mess,Qta,Message), print(Message), mas_send(Message), assert(taken(therapy(medicine(Med,Qta),H,M))).
 
-terapiaE(X) :> assert(therapy(X)).
+/* reminder per misurazione temperatura e peso */
+misura_temperatura :- not(misura_temperaturaP).
+misura_temperaturaI :> const_separator(X), const_misura(Y), atom_concat(Y,X,Mes), atom_concat(Mes,'temperatura',Message), mas_send(Message).
 
-saturazioneE(X) :> if(X<94, Res ='saturazione_danger',if(X<97, Res ='saturazione_ok', Res ='saturazione_normal')), print(Res),assert(Res), mas_send(Res),
-            lists(saturation,L), append(L,[X],Newlist), retractall(lists(saturation,_)), assert(lists(saturation,Newlist)).
+misura_peso :- not(misura_pesoP).
+misura_pesoI :> const_misura(Y), const_separator(X), atom_concat(Y,X,Mes), atom_concat(Mes,'peso',Message), mas_send(Message).
 
-battitoE(X) :> if(X<60, Res = 'battito_low',if(X>100, Res = 'battito_high', Res = 'battito_normal')), mas_send(Res),
-            lists(heartbeat,L), append(L,[X],Newlist), print(Newlist), retractall(lists(heartbeat,_)), assert(lists(heartbeat,Newlist)).
+misura_pressione :- not(misura_pressioneP).
+misura_pressioneI :> const_misura(Y), const_separator(X), atom_concat(Y,X,Mes), atom_concat(Mes,'pressione',Message), mas_send(Message).
 
-presminimaE(X) :> if(X<80, Res = 'presminima_low',if(X>84, Res = 'presminima_high',Res = 'presminima_normal')),  mas_send(Res),
-            lists(diastolic_pressure,L), append(L,[X],Newlist), retractall(lists(diastolic_pressure,_)), assert(lists(diastolic_pressure,Newlist)).
 
-presmassimaE(X) :> if(X<115, Res = 'presmassima_low', if(X>120, Res = 'presmassima_high', Res = 'presmassima_normal')),  mas_send(Res),
-            lists(systolic_pressure,L), append(L,[X],Newlist), retractall(lists(systolic_pressure,_)), assert(lists(systolic_pressure,Newlist)).
+/* raccolta dati del paziente e feedback immediato */
+terapiaE(X) :> pulisciStringa(X,Y), splitta_stringa(Y,L), nth0(0,L,Med), nth0(1,L,Qta), nth0(2,L,H), nth0(3,L,M),
+        assertz(therapy(Med,Qta,H,M)).
 
-temperaturaE(X) :> if(X>37, Message = 'pericolo', Message = 'tutto ok'), messageA(generalAgent,send_message(Message,Ag)), retractall(temperature(_)), assert(temperature(X)).
-
-pesoE(X) :> lists(weight,L), append(L,[X],Newlist), retractall(lists(weight,_)), assert(lists(weight,Newlist)).
+patologiaE(X) :> pulisciStringa(X,Y), assert(patology(Y)).
 
 altezzaE(X) :> retractall(height(_)), assert(height(X)).
 
-statoE(X) :> retractall(healthState(_)), assert(healthState(X)).
+pesoE(X) :> lists(weight,L), append(L,[X],Newlist), retractall(lists(weight,_)), assert(lists(weight,Newlist)).
 
-patologiaE(X) :> assert(patology(X)).
+saturazioneE(X) :> Base = 'saturazione', const_separator(S), atom_concat(Base,S,Mes),
+        if(X<94, Res ='high',if(X<97, Res ='low', Res ='normal')), atom_concat(Mes,Res,Message), mas_send(Message),
+        lists(saturation,L), append(L,[X],Newlist), retractall(lists(saturation,_)), assert(lists(saturation,Newlist)).
 
-misura_temperatura :- not(misura_temperaturaP).
-misura_temperaturaI :> separator(X), const_misura(Y), atom_concat(Y,X,Mes), atom_concat(Mes,'temperatura',Message), mas_send(Message).
+battitoE(X) :> Base = 'battito', const_separator(S), atom_concat(Base,S,Mes),
+        if(X<60, Res = 'low',if(X>100, Res = 'high', Res = 'normal')), atom_concat(Mes,Res,Message), mas_send(Message),
+        lists(heartbeat,L), append(L,[X],Newlist), retractall(lists(heartbeat,_)), assert(lists(heartbeat,Newlist)).
 
-misura_peso :- not(misura_pesoP).
-misura_pesoI :> const_misura(Y), separator(X), atom_concat(Y,X,Mes), atom_concat(Mes,'peso',Message), mas_send(Message).
+presminimaE(X) :> Base = 'presminima', const_separator(S), atom_concat(Base,S,Mes),
+        if(X<80, Res = 'low',if(X>84, Res = 'high',Res = 'normal')), atom_concat(Mes,Res,Message), mas_send(Message),
+        lists(diastolic_pressure,L), append(L,[X],Newlist), retractall(lists(diastolic_pressure,_)), assert(lists(diastolic_pressure,Newlist)).
 
-i_am(X,Diff) :- after_evp_time(peso(_),0,0,0,2), lists(weight,L), length(L,Index1), nth1(Index1,L,P1), Index2 is Index1 - 1, nth1(Index2,L,P2), Diff is P1-P2, if(Diff > 0, X = 'ingrassato', if(Diff == 0, X = 'invariato', X = 'dimagrito')).
-i_amI(X,Diff) :> print('sono '), print(X), print(' di '), print(Diff).
+presmassimaE(X) :> Base = 'presmassima', const_separator(S), atom_concat(Base,S,Mes),
+        if(X<115, Res = 'low', if(X>120, Res = 'high', Res = 'normal')), atom_concat(Mes,Res,Message), mas_send(Message),
+        lists(systolic_pressure,L), append(L,[X],Newlist), retractall(lists(systolic_pressure,_)), assert(lists(systolic_pressure,Newlist)).
 
-list_adjust(N,Tail) :- lists(N,[Head|Tail]),length(Tail,Length), Length > 3.
-list_adjustI(N,Newlist) :> print('aggiusto la lista'), print(N),nl, retractall(lists(N,_)), assert(lists(N,Newlist)).
+temperaturaE(X) :> Base = 'temperatura', const_separator(S), atom_concat(Base,S,Mes),
+        if(X >= 37, if(X < 38, Y = 'low', Y = 'high'), Y = 'ok'), atom_concat(Mes,Y,Message), mas_send(Message),
+        assert(fever(X,Y)).
 
-ipocondriaco :- healthState(X), X = 'Male'.
+statoE(X) :> pulisciStringa(X,Y),retractall(healthState(_)), assert(healthState(Y)).
 
-tachicardia :- lists(heartbeat,LH), length(LH,Index1), nth1(Index1,LH, V1), V1 > 120, Index2 is Index1 -1, nth1(Index2,LH, V2), V2 > 120, Index3 is Index2 -1, nth1(Index3,LH, V3), V3 > 120.
-ipossia_grave :- lists(saturation,LS), length(LS,Index1), nth1(Index1,LS, V1), V1 < 90, Index2 is Index1 -1, nth1(Index2,LS, V2), V2 < 90, Index3 is Index2 -1, nth1(Index3,LS, V3), V3 < 90.
-danger :- tachicardia; ipossia_grave.
 
-go_to_first_aid :- danger.
-go_to_first_aidI :> print('pronto soccorso'), mas_send('vai_al_pronto_soccorso').
+/* valutazione a lungo termine dello stato del paziente */
+i_am(X,Diff) :- after_evp_time(peso(_),0,0,0,2), lists(weight,L), length(L,Index1), nth1(Index1,L,P1), Index2 is Index1 - 1, nth1(Index2,L,P2),
+        const_separator(S), atom_concat('sei',S,Y),
+        Diff is P1-P2, if(Diff > 0, atom_concat(Y,'ingrassato',X), if(Diff == 0, atom_concat(Y,'invariato',X), atom_concat(Y,'dimagrito',X))).
+i_amI(X,Diff) :> const_separator(S), atom_concat(X,S,Mes), name(Mes,Cmes), name(Diff,Cdiff),
+        append(Cmes,Cdiff,Cmessage), name(Message,Cmessage), print(Message), mas_send(Message).
 
-ciaoE :> print('ciao user'), messageA(generalAgent,send_message(ciao,Ag)).
 
-provaE :> print('scrivo a python'), mas_send('prova_ricezione').
+tachicardia_ev :- after_evp_time(battito(_),0,0,0,1),lists(heartbeat,LH), last_values_mag(LH,120,Res), Res == 'si'.
+tachicardia_evI :> assert(tachicardia).
+
+
+ipossia_grave_ev :-  after_evp_time(saturazione(_),0,0,0,1), lists(saturation,LS), last_values_min(LS,90,Res), Res == 'si'.
+ipossia_grave_evI :> assert(ipossia_grave).
+
+
+presmin_alta_ev :-  after_evp_time(presminima(_),0,0,0,1), lists(diastolic_pressure,LMin), last_values_mag(LMin,90,Res),
+        (Res == si -> print(' presmin_alta '), true; retract(presmin_alta), false).
+presmin_alta_evI :> assert(presmin_alta).
+
+presmin_bassa_ev :-  after_evp_time(presminima(_),0,0,0,1), lists(diastolic_pressure,LMin), last_values_min(LMin,60,Res),
+        (Res == si -> print(' presmin_bassa '), true; retract(presmin_bassa), false).
+presmin_bassa_evI :> assert(presmin_bassa).
+
+presmax_alta_ev :-  after_evp_time(presmassima(_),0,0,0,1), lists(systolic_pressure,LMax), last_values_mag(LMax,140,Res),
+        (Res == si -> print(' presmax_alta '), true; retract(presmax_alta), false).
+presmax_alta_evI :> assert(presmax_alta).
+
+presmax_bassa_ev :-  after_evp_time(presmassima(_),0,0,0,1), lists(systolic_pressure,LMax), last_values_min(LMax,90,Res),
+        (Res == si -> print(' presmax_bassa '), true; retract(presmax_bassa), false).
+presmax_bassa_evI :> assert(presmax_bassa).
+
+ipotensione_ev :- after_evp_time(presmax_bassa_ev,0,0,0,2), presmin_bassa, presmax_bassa.
+ipotensione_evI :> assert(ipotensione), retract(presmin_bassa), retract(presmax_bassa).
+
+ipertensione_ev :- after_evp_time(presmax_alta_ev,0,0,0,2), presmax_alta, presmin_alta.
+ipertensione_evI :> assert(ipertensione), retract(presmax_alta), retract(presmin_alta).
+
+danger(X) :- tachicardia, X = 'tachicardia', retract(tachicardia);
+        ipossia_grave, X = 'ipossia_grave', retract(ipossia_grave);
+        ipotensione, X = 'ipotensione', retract(ipotensione);
+        ipertensione, X = 'ipertensione', print(X), retract(ipertensione).
+
+i_have_fever(X) :- after_evp_time(temperatura(_),0,0,0,1), fever(X,Y), Y == 'high'.
+i_have_feverI(X) :> messageA(doctorAgent, send_message(febbre(X),Ag)), retractall(fever(_,_)), print(' ho la febbre ').
+
+/* Interazione con agente dottore. */
+call_doctor(X) :- danger(X).
+call_doctorI(X) :> messageA(doctorAgent, send_message(malore(X),Ag)), print(' ho '), print(X), retract(danger(X)).
+
+doctor_suggestsE(X) :> const_separator(S),print(' il dottore suggerisce '), print(X),
+        atom_concat('doctor',S,Mes), atom_concat(Mes,X,Message), mas_send(Message).
+
+/* mantengo le liste dei parametri a 10 elementi cancellando il meno recente */
+list_adjust(N,Tail) :- lists(N,[Head|Tail]),length(Tail,Length), Limit is 9, Length >= Limit.
+list_adjustI(N,Newlist) :> retractall(lists(N,_)), assert(lists(N,Newlist)).
+
+
+/* confronto dei valori nelle liste */
+last_values_mag(List,Limit,Res) :- length(List,Index1), nth1(Index1,List, V1),
+        Index2 is Index1 -1, nth1(Index2,List, V2),
+        Index3 is Index2 -1, nth1(Index3,List, V3),
+        (V1 >= Limit, V2 >= Limit, V3 >= Limit -> Res='si' ; Res='no').
+
+last_values_min(List,Limit,Res) :- length(List,Index1), nth1(Index1,List, V1),
+        Index2 is Index1 -1, nth1(Index2,List, V2),
+        Index3 is Index2 -1, nth1(Index3,List, V3),
+        (V1 =< Limit, V2 =< Limit, V3 =< Limit -> Res='si' ; Res='no').
+
+/* fine. */

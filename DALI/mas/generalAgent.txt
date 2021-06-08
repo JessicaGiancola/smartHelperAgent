@@ -1,6 +1,0 @@
-:- compile('../mas/redis_client.pl').
-
-ciaoE :> print('ciao helper').
-
-pericoloE :> print('pericolo').
-

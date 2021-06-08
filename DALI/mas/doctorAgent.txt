@@ -1,0 +1,28 @@
+:- use_module(library(file_systems)).
+:- use_module(library(system)).
+
+:- dynamic medicine/1.
+:- dynamic illness/1.
+:- dynamic take/1.
+:- dynamic fever/1.
+
+:- assert(medicine('Tachipirina')).
+:- assert(medicine('Propafenone')).
+
+maloreE(X) :> print(' il paziente ha '), print(X), assert(illness(X)).
+
+febbreE(X) :> print(' il paziente ha la febbre a '), print(X),
+        if(X < 41, assert(illness('febbre')), assert(fever(X))).
+
+take(medicine('Tachipirina')) :- illness(X), X == 'febbre', retract(illness(X)).
+take(medicine('Propafenone')) :- illness(X), X == 'tachicardia', retract(illness(X)).
+
+go_to_first_aid :- illness(X), X == 'ipossia_grave', retract(illness(X));
+            illness(X), X == 'ipotensione', retract(illness(X));
+            illness(X), X == 'ipertensione', retract(illness(X));
+            fever(X), retract(fever(X)).
+go_to_first_aidI :> print(' suggerisco di andare al pronto soccorso '), messageA(smartHealthHelper,send_message(doctor_suggests('prontosoccorso'),Ag)).
+
+
+suggestion(medicine(X)) :- take(medicine(X)).
+suggestionI(medicine(X)) :> print(' suggerisco '), print(X), messageA(smartHealthHelper,send_message(doctor_suggests(X),Ag)), retract(take(medicine(X))).
