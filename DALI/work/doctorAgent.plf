@@ -19,11 +19,12 @@ external_event(febbre,normal).
 external_event(febbre,normal).
 external_event(malore,normal).
 external_event(malore,normal).
+external_event(variazione_peso,normal).
 internal_event(external_refused_action_propose(_868453,_868455),3,forever,true,until_cond(past(external_refused_action_propose(_868453,_868455)))).
 internal_event(gest_learn(_868433),3,forever,true,until_cond(past(gest_learn(_868433)))).
 internal_event(go_to_first_aid,3,forever,true,until_cond(past(go_to_first_aid))).
 internal_event(refused_message(_868463,_868465),3,forever,true,until_cond(past(refused_message(_868463,_868465)))).
-internal_event(suggestion(medicine(_868445)),3,forever,true,until_cond(past(suggestion(medicine(_868445))))).
+internal_event(suggestion(_868445),3,forever,true,until_cond(past(suggestion(_868445)))).
 mod(febbre,check).
 mod(febbre,check).
 mod(malore,check).
@@ -44,6 +45,7 @@ mod(message(_893835,inform(_893841,motivation(refused_message),_893623)),check).
 mod(message(_893857,send_message(sent_rmi(_893567,_893871,_893873),_893543)),check).
 mod(message(smartHealthHelper,send_message(doctor_suggests(_893567),_893543)),check).
 mod(message(smartHealthHelper,send_message(doctor_suggests(pronto-soccorso),_893543)),check).
+mod(variazione_peso,check).
 past_event(external_refused_action_propose(_868453,_868455),60).
 past_event(febbre(_902125),60).
 past_event(febbre,60).
@@ -70,6 +72,7 @@ past_event(message(smartHealthHelper,send_message(doctor_suggests(_868571),_8685
 past_event(message(smartHealthHelper,send_message(doctor_suggests(pronto-soccorso),_868547)),60).
 past_event(refused_message(_868463,_868465),60).
 past_event(suggestion(medicine(_868445)),60).
+past_event(variazione_peso(_911537),60).
 remember_event_mod(external_refused_action_propose(_868453,_868455),number(5),last).
 remember_event_mod(febbre(_902125),number(5),last).
 remember_event_mod(febbre,number(5),last).
@@ -96,3 +99,4 @@ remember_event_mod(message(smartHealthHelper,send_message(doctor_suggests(_86857
 remember_event_mod(message(smartHealthHelper,send_message(doctor_suggests(pronto-soccorso),_868547)),number(5),last).
 remember_event_mod(refused_message(_868463,_868465),number(5),last).
 remember_event_mod(suggestion(medicine(_868445)),number(5),last).
+remember_event_mod(variazione_peso(_911537),number(5),last).

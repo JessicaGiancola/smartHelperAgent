@@ -15,6 +15,7 @@ action(message(_203835,inform(_203841,motivation(refused_message),_203623)),norm
 action(message(_203857,send_message(sent_rmi(_203547,_203871,_203873),_203543)),normal).
 action(message(doctorAgent,send_message(febbre(_203547),_203543)),normal).
 action(message(doctorAgent,send_message(malore(_203547),_203543)),normal).
+action(message(doctorAgent,send_message(variazione_peso(_410157),_410153)),normal).
 external_event(altezza,normal).
 external_event(altezza,normal).
 external_event(battito,normal).
@@ -79,6 +80,7 @@ mod(message(_220325,inform(_220331,motivation(refused_message),_220113)),check).
 mod(message(_220347,send_message(sent_rmi(_220037,_220361,_220363),_220033)),check).
 mod(message(doctorAgent,send_message(febbre(_220037),_220033)),check).
 mod(message(doctorAgent,send_message(malore(_220037),_220033)),check).
+mod(message(doctorAgent,send_message(variazione_peso(_410157),_410153)),check).
 mod(patologia,check).
 mod(patologia,check).
 mod(peso,check).
@@ -127,6 +129,7 @@ past_event(message(_190617,inform(_190623,motivation(refused_message),_190405)),
 past_event(message(_190639,send_message(sent_rmi(_190329,_190653,_190655),_190325)),60).
 past_event(message(doctorAgent,send_message(febbre(_190329),_190325)),60).
 past_event(message(doctorAgent,send_message(malore(_190329),_190325)),60).
+past_event(message(doctorAgent,send_message(variazione_peso(_410157),_410153)),60).
 past_event(misura_peso,86400).
 past_event(misura_pressione,3600).
 past_event(misura_temperatura,3600).
@@ -186,6 +189,7 @@ remember_event_mod(message(_190617,inform(_190623,motivation(refused_message),_1
 remember_event_mod(message(_190639,send_message(sent_rmi(_190329,_190653,_190655),_190325)),number(5),last).
 remember_event_mod(message(doctorAgent,send_message(febbre(_190329),_190325)),number(5),last).
 remember_event_mod(message(doctorAgent,send_message(malore(_190329),_190325)),number(5),last).
+remember_event_mod(message(doctorAgent,send_message(variazione_peso(_410157),_410153)),number(5),last).
 remember_event_mod(misura_peso,number(5),last).
 remember_event_mod(misura_pressione,number(5),last).
 remember_event_mod(misura_temperatura,number(5),last).

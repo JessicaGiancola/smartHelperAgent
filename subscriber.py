@@ -111,16 +111,21 @@ def sendResponse(message, nome):
             break
 
         if case('doctor'):
-            if (splitted_message[1] == 'prontosoccorso'):
-                mes = "Devi correre al pronto soccorso"
-            else:
-                mes = "Il dottore suggerisce di prendere " + splitted_message[1]
+            for feed in switch(splitted_message[1]):
+                if feed('prontosoccorso'):
+                    mes = "Devi correre al pronto soccorso"
+                    break
+                if feed('bevi'):
+                    mes = "Il dottore suggerisce di ridurre il consumo di acqua"
+                    break
+                else:
+                    mes = "Il dottore suggerisce di prendere " + splitted_message[1]
 
             to_send = "&feedmedico=1&message=" + mes
             break
         else:
             to_send = ''
-            print( message + 'Risposta non valida')
+            print('Risposta non valida: ' + message)
 
     to_send_url = urlbase + to_send
     url = to_send_url.replace(" ", "%20")

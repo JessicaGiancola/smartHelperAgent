@@ -40,11 +40,12 @@ def run(patientName):
     name_url = patientName.replace(" ", "%20")
 
     parameters = [["saturazione", "get_saturazione"], ["battito", "get_battito"], ["presminima", "get_presminima"], ["presmassima", "get_presmassima"], ["temperatura", "get_temperatura"], ["peso", "get_peso"], ["altezza", "get_altezza"], ["stato", "get_stato"]]
-    #parameters = [["presminima", "get_presminima"], ["presmassima", "get_presmassima"]]
+    #parameters = [["saturazione", "get_saturazione"]]
 
     # Inserisco le malattie pregresse
 
-    request_url = "http://www.lorenzodelauretis.it/tesi/index.php?nome=" + name_url + "&get_patologia=1"
+    request_url = "http://localhost/prova.php?get_patologia=1"
+    #request_url = "http://www.lorenzodelauretis.it/tesi/index.php?nome=" + name_url + "&get_patologia=1"
     patologies = req.get(request_url)
     patologiesList = patologies.text.split(";")
 
@@ -56,8 +57,11 @@ def run(patientName):
             R.publish(CH_OUT, prologAtomic)
     print('inserite patologie')
 
+    time.sleep(30)
+
     # Inserisco la terapia
 
+    #request_url = "http://localhost/prova.php?get_terapia=1"
     request_url = "http://www.lorenzodelauretis.it/tesi/index.php?nome=" + name_url + "&get_terapia=1"
     therapies = req.get(request_url).text
     print(therapies)
@@ -74,10 +78,12 @@ def run(patientName):
             R.publish(CH_OUT, prologAtomic)
     print('inserita terapia')
 
+    time.sleep (30)
+
     for i in range(0, 10):
         getParameters(parameters, R, name_url)
         print(' inviati parametri n ' + str(i))
-        time.sleep(5)
+        time.sleep(10)
 
 
 if __name__ == '__main__':
