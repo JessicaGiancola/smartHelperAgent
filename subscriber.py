@@ -38,7 +38,7 @@ def sendResponse(message, nome):
             else:
                 mes = "Sei " + splitted_message[1] + " di " + str(chili) + " " + kg
 
-            to_send = "&feedpeso=1&message=" + mes
+            to_send = "&feed=peso&message=" + mes
             break
 
         if case('saturazione'):
@@ -121,7 +121,7 @@ def sendResponse(message, nome):
                 else:
                     mes = "Il dottore suggerisce di prendere " + splitted_message[1]
 
-            to_send = "&feedmedico=1&message=" + mes
+            to_send = "&feed=medico&message=" + mes
             break
         else:
             to_send = ''
