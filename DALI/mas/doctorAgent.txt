@@ -10,7 +10,7 @@
 :- assert(medicine('Tachipirina')).
 :- assert(medicine('Propafenone')).
 
-variazione_pesoE(X) :> print(X), if(X > 2, assert(feedpeso('bevi_meno')), true).
+variazione_pesoE(X) :> if(X > 2, assert(feedpeso('bevi_meno')), true).
 
 maloreE(X) :> print('Il paziente ha '), print(X), assert(illness(X)).
 
@@ -21,6 +21,7 @@ take(medicine('Tachipirina')) :- illness(X), X == 'febbre', retract(illness(X)).
 take(medicine('Propafenone')) :- illness(X), X == 'tachicardia', retract(illness(X)).
 
 go_to_first_aid :- illness(X), X == 'ipossia_grave', retract(illness(X));
+            illness(X), X == 'bradicardia', retract(illness(X));
             illness(X), X == 'ipotensione', retract(illness(X));
             illness(X), X == 'ipertensione', retract(illness(X));
             fever(X), retract(fever(X)).

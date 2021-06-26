@@ -143,3 +143,8 @@ DALI/work/smartHealthHelper.txt
 *.pl
 DALI/work/generalAgent.txt
 DALI/work/doctorAgent.txt
+DALI/conf/communication_doctorAgent.txt
+DALI/conf/doctorAgent.txt
+DALI/conf/makeconf-vecchio.bat
+DALI/log/log_doctorAgent.txt
+DALI/log/log_smartHealthHelper.txt

@@ -13,11 +13,6 @@ def makeAtomic(s, therapy=False):
         out = out.replace('(', 'A')
         out = out.replace(')', 'B')
         out = out.replace(',', 'F')
-    # out = out.replace('[', 'C')
-    # out = out.replace(']', 'D')
-    # out = out.replace('.', 'E')
-    # out = out.replace('/', 'G')
-    # out = out.replace('\\', 'H')
     return out
 
 
@@ -39,13 +34,12 @@ def run(patientName):
     R = redis.Redis()  # Istanza 1 di Redis
     name_url = patientName.replace(" ", "%20")
 
-    parameters = [["saturazione", "get_saturazione"], ["battito", "get_battito"], ["presminima", "get_presminima"], ["presmassima", "get_presmassima"], ["temperatura", "get_temperatura"], ["peso", "get_peso"], ["altezza", "get_altezza"], ["stato", "get_stato"]]
-    #parameters = [["saturazione", "get_saturazione"]]
+    parameters = [["anni", "get_eta"], ["altezza", "get_altezza"], ["peso", "get_peso"], ["temperatura", "get_temperatura"], ["saturazione", "get_saturazione"], ["battito", "get_battito"], ["presminima", "get_presminima"], ["presmassima", "get_presmassima"], ["stato", "get_stato"]]
 
     # Inserisco le malattie pregresse
 
-    request_url = "http://localhost/prova.php?get_patologia=1"
-    #request_url = "http://www.lorenzodelauretis.it/tesi/index.php?nome=" + name_url + "&get_patologia=1"
+    #request_url = "http://localhost/prova.php?get_patologia=1"
+    request_url = "http://www.lorenzodelauretis.it/tesi/index.php?nome=" + name_url + "&get_patologia=1"
     patologies = req.get(request_url)
     patologiesList = patologies.text.split(";")
 
@@ -78,7 +72,7 @@ def run(patientName):
             R.publish(CH_OUT, prologAtomic)
     print('inserita terapia')
 
-    time.sleep (30)
+    time.sleep (5)
 
     for i in range(0, 10):
         getParameters(parameters, R, name_url)

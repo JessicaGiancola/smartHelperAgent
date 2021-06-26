@@ -5,6 +5,7 @@
 :- compile('../pulisciStringhe.pl').
 
 :- dynamic height/1.
+:- dynamic age/1.
 :- dynamic weight/1.
 :- dynamic lists/2.
 :- dynamic healthState/1.
@@ -13,6 +14,7 @@
 :- dynamic taken/1.
 :- dynamic temperature/1.
 :- dynamic tachicardia/0.
+:- dynamic bradicardia/0.
 :- dynamic ipossia_grave/0.
 :- dynamic presmin_alta/0.
 :- dynamic presmin_bassa/0.
@@ -59,12 +61,14 @@ misura_pressioneI :> const_misura(Y), const_separator(X), atom_concat(Y,X,Mes), 
 
 
 /* raccolta dati del paziente e feedback immediato */
-terapiaE(X) :> pulisciStringa(X,Y), splitta_stringa(Y,L), nth0(0,L,Med), nth0(1,L,Qta), nth0(2,L,H), nth0(3,L,M),
+altezzaE(X) :> retractall(height(_)), assert(height(X)).
+
+anniE(X) :> retractall(age(_)), assert(age(X)).
+
+terapiaE(X) :> pulisciStringa(X,Y), splitta_su_virgole(Y,L), print('Terapia '), print(L),nl, nth0(0,L,Med), nth0(1,L,Qta), nth0(2,L,H), nth0(3,L,M),
         assertz(therapy(Med,Qta,H,M)).
 
 patologiaE(X) :> pulisciStringa(X,Y), assert(patology(Y)), print('Patologia '), print(Y), nl.
-
-altezzaE(X) :> retractall(height(_)), assert(height(X)).
 
 pesoE(X) :> lists(weight,L), append(L,[X],Newlist), retractall(lists(weight,_)), assert(lists(weight,Newlist)).
 
@@ -88,7 +92,7 @@ temperaturaE(X) :> Base = 'temperatura', const_separator(S), atom_concat(Base,S,
         if(X >= 37, if(X < 38, Y = 'low', Y = 'high'), Y = 'ok'), atom_concat(Mes,Y,Message), mas_send(Message),
         assert(fever(X,Y)).
 
-statoE(X) :> pulisciStringa(X,Y),retractall(healthState(_)), assert(healthState(Y)).
+statoE(X) :> pulisciStringa(X,Y), retractall(healthState(_)), assert(healthState(Y)).
 
 
 /* valutazione a lungo termine dello stato del paziente */
@@ -102,6 +106,9 @@ i_amI(X,Diff) :> const_separator(S), atom_concat(X,S,Mes), name(Mes,Cmes), name(
 
 tachicardia_ev :- after_evp_time(battito(_),0,0,0,1),lists(heartbeat,LH), last_values_mag(LH,120,Res), Res == 'si'.
 tachicardia_evI :> assert(tachicardia).
+
+bradicardia_ev :- after_evp_time(battito(_),0,0,0,1),lists(heartbeat,LH), last_values_min(LH,60,Res), Res == 'si'.
+bradicardia_evI :> assert(bradicardia).
 
 
 ipossia_grave_ev :-  after_evp_time(saturazione(_),0,0,0,1), lists(saturation,LS), last_values_min(LS,90,Res), Res == 'si'.
@@ -131,6 +138,7 @@ ipertensione_ev :- after_evp_time(presmax_alta_ev,0,0,0,2), presmax_alta, presmi
 ipertensione_evI :> assert(ipertensione), retract(presmax_alta), retract(presmin_alta).
 
 danger(X) :- tachicardia, X = 'tachicardia', retract(tachicardia);
+        bradicardia, X = 'bradicardia', retract(bradicardia);
         ipossia_grave, X = 'ipossia_grave', retract(ipossia_grave);
         ipotensione, X = 'ipotensione', retract(ipotensione);
         ipertensione, X = 'ipertensione', retract(ipertensione).
@@ -146,8 +154,8 @@ doctor_suggestsE(X) :> const_separator(S),print('Il dottore suggerisce: '), prin
         atom_concat('doctor',S,Mes), atom_concat(Mes,X,Message), mas_send(Message).
 
 /* mantengo le liste dei parametri a 10 elementi cancellando il meno recente */
-list_adjust(N,Tail) :- lists(N,[Head|Tail]),length(Tail,Length), Limit is 9, Length >= Limit.
-list_adjustI(N,Newlist) :> retractall(lists(N,_)), assert(lists(N,Newlist)).
+resize_list(N,Tail) :- lists(N,[Head|Tail]),length(Tail,Length), Limit is 9, Length >= Limit.
+resize_listI(N,Newlist) :> retractall(lists(N,_)), assert(lists(N,Newlist)).
 
 
 /* confronto dei valori nelle liste */
