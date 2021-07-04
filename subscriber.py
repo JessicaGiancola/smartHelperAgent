@@ -5,7 +5,7 @@ import time
 
 # Canale su cui il MAS invia i messaggi
 CH_IN = 'RESPONSE'
-SEPARATOR = '_'
+SEPARATOR = '+'
 
 
 # Svuota la lista dei messaggi inviati dal MAS
@@ -14,10 +14,10 @@ def clearList(redisInstance, channel):
         redisInstance.lpop(channel)
     return
 
+
 # Elaboro la risposta e la invio al database
-def sendResponse(message, nome):
+def sendResponse(message, url_base):
     splitted_message = message.split(SEPARATOR)
-    urlbase = "http://www.lorenzodelauretis.it/tesi/index.php?nome=" + nome
     to_send = ""
     mes = ""
     for case in switch(splitted_message[0]):
@@ -26,14 +26,16 @@ def sendResponse(message, nome):
             break
 
         if case('medicina'):
-            to_send = "&remindermedicina=1&nomemedicina=" + splitted_message[1].replace("-","%20") + "&quantita=" + splitted_message[2].replace("-","%20") + "&message=Devi prendere la medicina " + splitted_message[1] + " quantita " + splitted_message[2]
+            to_send = "&remindermedicina=1&nomemedicina=" + splitted_message[1].replace("-", " ") + "&quantita=" \
+                      + splitted_message[2].replace("-", " ") + "&message=Devi prendere la medicina " \
+                      + splitted_message[1] + " quantita " + splitted_message[2]
             break
 
         if case('sei'):
-            chili = abs(round(float(splitted_message[2]),2))
+            chili = abs(round(float(splitted_message[2]), 2))
             kg = "chilo" if chili == 1 else "chili"
 
-            if (splitted_message[1] == 'invariato'):
+            if splitted_message[1] == 'invariato':
                 mes = "Il tuo peso non ha subito variazioni"
             else:
                 mes = "Sei " + splitted_message[1] + " di " + str(chili) + " " + kg
@@ -119,31 +121,36 @@ def sendResponse(message, nome):
                     mes = "Il dottore suggerisce di ridurre il consumo di acqua"
                     break
                 else:
-                    mes = "Il dottore suggerisce di prendere " + splitted_message[1]
+                    mes = "Il dottore suggerisce di prendere " + splitted_message[1].replace("_", " ")
 
             to_send = "&feed=medico&message=" + mes
             break
+
+        if case('how'):
+            to_send = "&message=Come ti senti?"
+            break
+
         else:
             to_send = ''
             print('Risposta non valida: ' + message)
 
-    to_send_url = urlbase + to_send
+    to_send_url = url_base + to_send
     url = to_send_url.replace(" ", "%20")
-    #url = "http://localhost/prova.php?message=" + to_send_url
     print(url)
     req.get(url)
     return
 
 
-def run(nome):
+def run(patientName):
     R = redis.Redis()
     clearList(R, CH_IN)
-
+    #url_base = "http://www.lorenzodelauretis.it/tesi/index.php?nome=" + patientName
+    url_base = "http://localhost/prova.php?"
     while True:
         response = R.lpop(CH_IN)
         if response:
             # Ho ricevuto un messaggio
-            sendResponse(response.decode('utf-8'), nome)
+            sendResponse(response.decode('utf-8'), url_base)
             print(response.decode('utf-8'))
 
 
@@ -151,9 +158,9 @@ if __name__ == '__main__':
 
     try:
         file = open('nome_paziente.txt', 'r')
-        nome = file.read()  # leggo il nome del paziente dal file
-        print(nome)
+        patientName = file.read()  # leggo il nome del paziente dal file
         file.close()
-        run(nome)  # Passo come parametro il nome del paziente
+        run(patientName)  # Passo come parametro il nome del paziente
+
     except IOError:
         print("File not accessible")

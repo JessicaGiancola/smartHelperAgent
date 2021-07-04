@@ -20,6 +20,9 @@ febbreE(X) :> print('Il paziente ha la febbre a '), print(X),
 take(medicine('Tachipirina')) :- illness(X), X == 'febbre', retract(illness(X)).
 take(medicine('Propafenone')) :- illness(X), X == 'tachicardia', retract(illness(X)).
 
+take(medicine('Pastiglia_sub-linguale')) :- illness(X), X == 'dol_petto', retract(illness(X));
+            illness(X), X == 'dol_braccia', retract(illness(X)).
+
 go_to_first_aid :- illness(X), X == 'ipossia_grave', retract(illness(X));
             illness(X), X == 'bradicardia', retract(illness(X));
             illness(X), X == 'ipotensione', retract(illness(X));

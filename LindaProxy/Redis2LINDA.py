@@ -15,18 +15,18 @@ See the License for the specific language governing permissions and limitations 
 import LindaProxy.lindaproxy as lp
 import redis
 
-def makeAtomic(s):
-    out = s.replace('(', 'A')
-    out = out.replace(')', 'B')
-    out = out.replace('[', 'C')
-    out = out.replace(']', 'D')
-    out = out.replace('.', 'E')
-    out = out.replace(',', 'F')
-    out = out.replace('/', 'G')
-    out = out.replace('\\', 'H')
-    out = out.replace("'", 'I')
-    out = out.replace(' ', 'O')
-    return out
+# def makeAtomic(s):
+#     out = s.replace('(', 'A')
+#     out = out.replace(')', 'B')
+#     out = out.replace('[', 'C')
+#     out = out.replace(']', 'D')
+#     out = out.replace('.', 'E')
+#     out = out.replace(',', 'F')
+#     out = out.replace('/', 'G')
+#     out = out.replace('\\', 'H')
+#     out = out.replace("'", 'I')
+#     out = out.replace(' ', 'O')
+#     return out
 
 # Canale di comunicazione da Redis a LINDA e da LINDA al MAS.
 # Da usare come main rispetto a lindaproxy
@@ -40,8 +40,8 @@ R = redis.Redis()
 pubsub = R.pubsub()
 pubsub.subscribe('TO_AGENT')
 for item in pubsub.listen():
-    if item['type']=='message':
-        msg=item['data'].decode('utf-8')
+    if item['type'] == 'message':
+        msg = item['data'].decode('utf-8')
         #atomic = makeAtomic(msg)
-        print('evento redis', msg)
+        print('Redis', msg)
         L.send_message('smartHealthHelper', msg)

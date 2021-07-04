@@ -34,12 +34,14 @@ external_event(presminima,normal).
 external_event(presminima,normal).
 external_event(saturazione,normal).
 external_event(saturazione,normal).
+external_event(sensazione,normal).
 external_event(stato,normal).
 external_event(stato,normal).
 external_event(temperatura,normal).
 external_event(temperatura,normal).
 external_event(terapia,normal).
 external_event(terapia,normal).
+internal_event(angina_ev(_423705),3,1,change([sensazione(_)]),until_cond(past(angina_ev(_423705)))).
 internal_event(bradicardia_ev,3,1,change([battito(_)]),until_cond(past(bradicardia_ev))).
 internal_event(call_doctor(_188785),3,forever,true,until_cond(past(call_doctor(_188785)))).
 internal_event(external_refused_action_propose(_188827,_188829),3,forever,true,until_cond(past(external_refused_action_propose(_188827,_188829)))).
@@ -61,6 +63,7 @@ internal_event(resize_list(_188847,_188849),3,forever,true,until_cond(past(resiz
 internal_event(restart_therapy,60,forever,true,until_cond(past(restart_therapy))).
 internal_event(tachicardia_ev,3,1,change([battito(_)]),until_cond(past(tachicardia_ev))).
 internal_event(take_medicine(therapy(_188813,_188815,_188793,_188819)),180,forever,true,until_cond(past(take_medicine(therapy(_188813,_188815,_188793,_188819))))).
+internal_event(whats_up,3,1,change([angina_ev(_)]),until_cond(past(whats_up))).
 mod(altezza,check).
 mod(altezza,check).
 mod(anni,check).
@@ -96,6 +99,7 @@ mod(presminima,check).
 mod(presminima,check).
 mod(saturazione,check).
 mod(saturazione,check).
+mod(sensazione,check).
 mod(stato,check).
 mod(stato,check).
 mod(temperatura,check).
@@ -104,6 +108,7 @@ mod(terapia,check).
 mod(terapia,check).
 past_event(altezza(_412725),60).
 past_event(altezza,60).
+past_event(angina_ev(_423705),60).
 past_event(anni(_412717),60).
 past_event(anni,60).
 past_event(battito(_412709),60).
@@ -157,6 +162,7 @@ past_event(resize_list(_370667,_370669),60).
 past_event(restart_therapy,60).
 past_event(saturazione(_412661),60).
 past_event(saturazione,60).
+past_event(sensazione(_420923),60).
 past_event(stato(_412653),60).
 past_event(stato,60).
 past_event(tachicardia_ev,60).
@@ -165,8 +171,10 @@ past_event(temperatura(_412645),60).
 past_event(temperatura,60).
 past_event(terapia(_412637),60).
 past_event(terapia,60).
+past_event(whats_up,60).
 remember_event_mod(altezza(_412725),number(5),last).
 remember_event_mod(altezza,number(5),last).
+remember_event_mod(angina_ev(_423705),number(5),last).
 remember_event_mod(anni(_412717),number(5),last).
 remember_event_mod(anni,number(5),last).
 remember_event_mod(battito(_412709),number(5),last).
@@ -220,6 +228,7 @@ remember_event_mod(resize_list(_370667,_370669),number(5),last).
 remember_event_mod(restart_therapy,number(5),last).
 remember_event_mod(saturazione(_412661),number(5),last).
 remember_event_mod(saturazione,number(5),last).
+remember_event_mod(sensazione(_420923),number(5),last).
 remember_event_mod(stato(_412653),number(5),last).
 remember_event_mod(stato,number(5),last).
 remember_event_mod(tachicardia_ev,number(5),last).
@@ -228,3 +237,4 @@ remember_event_mod(temperatura(_412645),number(5),last).
 remember_event_mod(temperatura,number(5),last).
 remember_event_mod(terapia(_412637),number(5),last).
 remember_event_mod(terapia,number(5),last).
+remember_event_mod(whats_up,number(5),last).
