@@ -4,31 +4,11 @@
 :- compile('../mas/redis_client.pl').
 :- compile('../pulisciStringhe.pl').
 
-:- dynamic height/1.
-:- dynamic age/1.
-:- dynamic weight/1.
-:- dynamic lists/2.
-:- dynamic healthState/1.
-:- dynamic trouble/1.
-:- dynamic patology/1.
-:- dynamic therapy/4.
-:- dynamic taken/1.
-:- dynamic temperature/1.
-:- dynamic presmin_alta/0.
-:- dynamic presmin_bassa/0.
-:- dynamic presmax_alta/0.
-:- dynamic presmax_bassa/0.
-:- dynamic fever/2.
-:- dynamic angina/1.
-:- dynamic danger/1.
+:- dynamic height/1, age/1, weight/1, lists/2, healthState/1, trouble/1, patology/1, therapy/4, taken/1, temperature/1,
+        presmin_alta/0, presmin_bassa/0, presmax_alta/0, presmax_bassa/0, fever/2, angina/1, danger/1.
 
-:- assert(lists(weight,[])).
-:- assert(lists(heartbeat,[])).
-:- assert(lists(systolic_pressure,[])).
-:- assert(lists(diastolic_pressure,[])).
-:- assert(lists(saturation,[])).
-:- assert(lists(patology,[])).
-:- assert(lists(therapy,[])).
+:- assert(lists(weight,[])), assert(lists(heartbeat,[])), assert(lists(systolic_pressure,[])),
+    assert(lists(diastolic_pressure,[])), assert(lists(saturation,[])), assert(lists(patology,[])), assert(lists(therapy,[])).
 
 /* costanti */
 :- retractall(const_separator(_)), assert(const_separator('+')).
