@@ -13,6 +13,9 @@
 /* costanti */
 :- retractall(const_separator(_)), assert(const_separator('+')).
 :- retractall(const_misura(_)), assert(const_misura('misura')).
+:- retractall(const_low(_)), assert(const_low('low')).
+:- retractall(const_normal(_)), assert(const_normal('normal')).
+:- retractall(const_high(_)), assert(const_high('high')).
 
 
 /* reminder per terapia */
@@ -50,24 +53,29 @@ patologiaE(X) :> pulisciStringa(X,Y), assert(patology(Y)), print('Patologia '), 
 pesoE(X) :> lists(weight,L), append(L,[X],Newlist), retractall(lists(weight,_)), assert(lists(weight,Newlist)).
 
 saturazioneE(X) :> Base = 'saturazione', const_separator(S), atom_concat(Base,S,Mes),
-        if(X<94, Res ='high',if(X<97, Res ='low', Res ='normal')), atom_concat(Mes,Res,Message), mas_send(Message),
+        const_low(Low), const_normal(Normal), const_high(High),
+        if(X<94, Res = High,if(X<97, Res = Low, Res = Normal)), atom_concat(Mes,Res,Message), mas_send(Message),
         lists(saturation,L), append(L,[X],Newlist), retractall(lists(saturation,_)), assert(lists(saturation,Newlist)).
 
 battitoE(X) :> Base = 'battito', const_separator(S), atom_concat(Base,S,Mes),
-        if(X<60, Res = 'low',if(X>100, Res = 'high', Res = 'normal')), atom_concat(Mes,Res,Message), mas_send(Message),
+        const_low(Low), const_normal(Normal), const_high(High),
+        if(X<60, Res = Low,if(X>100, Res = High, Res = Normal)), atom_concat(Mes,Res,Message), mas_send(Message),
         lists(heartbeat,L), append(L,[X],Newlist), retractall(lists(heartbeat,_)), assert(lists(heartbeat,Newlist)).
 
 presminimaE(X) :> Base = 'presminima', const_separator(S), atom_concat(Base,S,Mes),
-        if(X<80, Res = 'low',if(X>84, Res = 'high',Res = 'normal')), atom_concat(Mes,Res,Message), mas_send(Message),
+        const_low(Low), const_normal(Normal), const_high(High),
+        if(X<80, Res = Low,if(X>84, Res = High,Res = Normal)), atom_concat(Mes,Res,Message), mas_send(Message),
         lists(diastolic_pressure,L), append(L,[X],Newlist), retractall(lists(diastolic_pressure,_)), assert(lists(diastolic_pressure,Newlist)).
 
 presmassimaE(X) :> Base = 'presmassima', const_separator(S), atom_concat(Base,S,Mes),
-        if(X<115, Res = 'low', if(X>120, Res = 'high', Res = 'normal')), atom_concat(Mes,Res,Message), mas_send(Message),
+        const_low(Low), const_normal(Normal), const_high(High),
+        if(X<115, Res = Low, if(X>120, Res = High, Res = Normal)), atom_concat(Mes,Res,Message), mas_send(Message),
         lists(systolic_pressure,L), append(L,[X],Newlist), retractall(lists(systolic_pressure,_)), assert(lists(systolic_pressure,Newlist)).
 
 temperaturaE(X) :> Base = 'temperatura', const_separator(S), atom_concat(Base,S,Mes),
-        if(X >= 37, if(X < 38, Y = 'low', Y = 'high'), Y = 'ok'), atom_concat(Mes,Y,Message), mas_send(Message),
-        assert(fever(X,Y)).
+        const_low(Low), const_normal(Normal), const_high(High),
+        if(X >= 37, if(X < 38, Res = Low, Res = High), Res = Normal), atom_concat(Mes,Res,Message), mas_send(Message),
+        assert(fever(X,Res)).
 
 statoE(X) :> pulisciStringa(X,Y), assert(healthState(Y)).
 
@@ -148,5 +156,3 @@ last_values_min(List,Limit,Res) :- length(List,Index1), nth1(Index1,List, V1),
         Index2 is Index1 -1, nth1(Index2,List, V2),
         Index3 is Index2 -1, nth1(Index3,List, V3),
         (V1 =< Limit, V2 =< Limit, V3 =< Limit -> Res='si' ; Res='no').
-
-/* fine. */

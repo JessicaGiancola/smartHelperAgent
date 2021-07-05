@@ -3,7 +3,7 @@
 
 :- dynamic medicine/1, illness/1, take/1, fever/1, feedpeso/1.
 
-
+/* messaggi che ricevo da Smart Health Helper */
 variazione_pesoE(X) :> if(X > 2, assert(feedpeso('bevi_meno')), true).
 
 maloreE(X) :> print('Il paziente ha '), print(X), assert(illness(X)).
@@ -11,12 +11,16 @@ maloreE(X) :> print('Il paziente ha '), print(X), assert(illness(X)).
 febbreE(X) :> print('Il paziente ha la febbre a '), print(X),
         if(X < 41, assert(illness('febbre')), assert(fever(X))).
 
+
+/* medicinali consigliabili */
 take(medicine('Tachipirina')) :- illness(X), X == 'febbre', retract(illness(X)).
 take(medicine('Propafenone')) :- illness(X), X == 'tachicardia', retract(illness(X)).
 
 take(medicine('Pastiglia_sub-linguale')) :- illness(X), X == 'dol_petto', retract(illness(X));
             illness(X), X == 'dol_braccia', retract(illness(X)).
 
+
+/* risposta a Smart Health Helper */
 go_to_first_aid :- illness(X), X == 'ipossia_grave', retract(illness(X));
             illness(X), X == 'bradicardia', retract(illness(X));
             illness(X), X == 'ipotensione', retract(illness(X));
@@ -24,7 +28,6 @@ go_to_first_aid :- illness(X), X == 'ipossia_grave', retract(illness(X));
             fever(X), retract(fever(X)).
 go_to_first_aidI :> print(' suggerisco di andare al pronto soccorso '), 
 	messageA(smartHealthHelper,send_message(doctor_suggests('prontosoccorso'),Ag)).
-
 
 suggestion(X) :- take(medicine(X)); feedpeso(X).
 suggestionI(X) :> print(' suggerisco '), print(X),
